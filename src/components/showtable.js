@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import html2pdf from "html2pdf.js";
+import API_URL from "./config";
+
 
 const Showtable = () => {
   const [timetables, setTimetables] = useState([]);
@@ -34,9 +36,7 @@ const Showtable = () => {
   useEffect(() => {
     const fetchTimetables = async () => {
       try {
-        const response = await axios.get(
-          "/api/timetables",
-        );
+        const response = await axios.get(`${API_URL}/api/timetables`);
         setTimetables(response.data.data || []);
         setFilteredTimetables(response.data.data || []);
       } catch (err) {

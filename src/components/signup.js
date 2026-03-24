@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import API_URL from "./config";
+
 
 const Signup = () => {
   const [name, setname] = useState("");
@@ -12,7 +14,7 @@ const Signup = () => {
 
     try {
       console.log("🚀 Attempting fetch to /signup...");
-      const result = await fetch("/signup", {
+      const result = await fetch(`${API_URL}/signup`, {
         method: "post",
         body: JSON.stringify(data),
         headers: {

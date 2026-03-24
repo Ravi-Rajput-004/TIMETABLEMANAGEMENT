@@ -1,6 +1,8 @@
 import React, { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import context from "./context";
+import API_URL from "./config";
+
 
 const Login = () => {
   const [email, setemail] = useState("");
@@ -14,7 +16,7 @@ const Login = () => {
     const all = { email, password };
 
     try {
-      const result = await fetch("/login", {
+      const result = await fetch(`${API_URL}/login`, {
         method: "POST",
         body: JSON.stringify(all),
         headers: {

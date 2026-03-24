@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import API_URL from "./config";
+
 
 const StudentLogin = () => {
   const classBranches = {
@@ -45,7 +47,7 @@ const StudentLogin = () => {
     setError(null);
 
     try {
-      const response = await fetch("/api/students/login", {
+      const response = await fetch(`${API_URL}/api/students/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +77,7 @@ const StudentLogin = () => {
     setTimetableError(null);
 
     try {
-      const response = await fetch("http://localhost:8000/api/timetables");
+      const response = await fetch(`${API_URL}/api/timetables`);
       const data = await response.json();
 
       if (!response.ok)

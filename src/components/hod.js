@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import API_URL from "./config";
+
 
 const Hod = () => {
   const [teachers, setTeachers] = useState([]);
@@ -18,7 +20,7 @@ const Hod = () => {
   const fetchTeachers = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/teachers");
+      const response = await fetch(`${API_URL}/api/teachers`);
       if (!response.ok) {
         throw new Error("Failed to fetch teachers");
       }
@@ -41,7 +43,7 @@ const Hod = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/teachers", {
+      const response = await fetch(`${API_URL}/api/teachers`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

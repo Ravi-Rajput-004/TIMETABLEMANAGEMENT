@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import API_URL from "./config";
+
 
 const Timetable = () => {
   const [teachers, setTeachers] = useState([]);
@@ -47,7 +49,7 @@ const Timetable = () => {
 
   const fetchTeachers = async () => {
     try {
-      const response = await fetch("/api/teachers");
+      const response = await fetch(`${API_URL}/api/teachers`);
       if (!response.ok) {
         throw new Error("Failed to fetch teachers");
       }
@@ -100,7 +102,7 @@ const Timetable = () => {
     setSubmitStatus(null);
 
     try {
-      const response = await fetch("/api/timetables", {
+      const response = await fetch(`${API_URL}/api/timetables`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
