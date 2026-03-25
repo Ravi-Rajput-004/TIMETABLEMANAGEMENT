@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import html2pdf from "html2pdf.js";
-import API_URL from "./config";
+import API_URL from "../config";
 
 
 const Showtable = () => {

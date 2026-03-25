@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import context from "./context";
-import API_URL from "./config";
+import API_URL from "../config";
 
 
 const Login = () => {
