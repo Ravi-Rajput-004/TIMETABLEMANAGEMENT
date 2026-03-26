@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import API_URL from "../config";
 
 
 const StudentLogin = () => {
-  const classBranches = {
-    MCA: ["Computer Science", "Information Technology"],
-    MBA: ["Business Administration", "Finance"],
-    "B.Tech": ["Computer Science", "Electronics", "Mechanical"],
-  };
 
   const timeSlots = [
     "9:00-10:00",
@@ -31,7 +26,6 @@ const StudentLogin = () => {
   const [error, setError] = useState(null);
   const [loadingTimetable, setLoadingTimetable] = useState(false);
   const [timetableError, setTimetableError] = useState(null);
-  const navigate = useNavigate();
 
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
@@ -70,7 +64,7 @@ const StudentLogin = () => {
     }
   };
 
-  const fetchTimetable = async () => {
+  const fetchTimetable = useCallback(async () => {
     if (!studentDetails) return;
 
     setLoadingTimetable(true);
@@ -84,15 +78,15 @@ const StudentLogin = () => {
         throw new Error(data.message || "Failed to fetch timetable");
 
       const filteredTimetable = data.data.find(
-        (table) =>
-          table.semester.toString() === studentDetails.semester &&
-          table.class === studentDetails.class &&
-          table.branch === studentDetails.branch,
+          (table) =>
+              table.semester.toString() === studentDetails.semester &&
+              table.class === studentDetails.class &&
+              table.branch === studentDetails.branch,
       );
 
       if (!filteredTimetable) {
         throw new Error(
-          "No timetable found for your class, semester and branch",
+            "No timetable found for your class, semester and branch",
         );
       }
 
@@ -103,7 +97,7 @@ const StudentLogin = () => {
     } finally {
       setLoadingTimetable(false);
     }
-  };
+  }, [studentDetails]);
 
   useEffect(() => {
     const storedStudent = localStorage.getItem("student");
@@ -116,7 +110,7 @@ const StudentLogin = () => {
     if (studentDetails) {
       fetchTimetable();
     }
-  }, [studentDetails]);
+  }, [studentDetails, fetchTimetable]);
 
   const handleLogout = () => {
     localStorage.removeItem("student");
