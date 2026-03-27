@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../config";
+import { toast } from "react-toastify";
 
 
 const Timetable = () => {
@@ -29,7 +30,6 @@ const Timetable = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
 
   const timeSlots = [
     "9:00-10:00",
@@ -57,6 +57,7 @@ const Timetable = () => {
       setTeachers(data.data.map((teacher) => teacher.name));
     } catch (error) {
       console.error("Error fetching teachers:", error);
+      toast.error("Error fetching teachers list");
     }
   };
 
@@ -99,7 +100,6 @@ const Timetable = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus(null);
 
     try {
       const response = await fetch(`${API_URL}/api/timetables`, {
@@ -114,10 +114,7 @@ const Timetable = () => {
         throw new Error("Failed to save timetable");
       }
 
-      setSubmitStatus({
-        success: true,
-        message: "Timetable saved successfully!",
-      });
+      toast.success("Timetable saved successfully!");
 
       setTimetableData({
         semester: "",
@@ -137,10 +134,7 @@ const Timetable = () => {
         unavailableTeachers: [],
       });
     } catch (error) {
-      setSubmitStatus({
-        success: false,
-        message: error.message || "Error saving timetable",
-      });
+       toast.error(error.message || "Error saving timetable");
     } finally {
       setIsSubmitting(false);
     }
@@ -226,30 +220,30 @@ const Timetable = () => {
                 </h3>
               </div>
 
-              <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-800 text-white">
+              <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm custom-scrollbar">
+                <table className="min-w-full border-separate border-spacing-0">
+                  <thead className="bg-gray-900 text-white sticky top-0 z-20">
                     <tr>
-                      <th className="px-4 py-4 text-center text-sm font-semibold tracking-wide border-r border-gray-700 bg-gray-900 sticky left-0 z-10 w-28 shrink-0">
-                        Day/Time
+                      <th className="px-4 py-5 text-center text-xs font-black uppercase tracking-widest border-r border-gray-800 bg-gray-900 sticky left-0 z-30 min-w-[120px]">
+                        Day / Time
                       </th>
                       {timeSlots.map((time, index) => (
                         <th
                           key={index}
-                          className="px-4 py-4 text-center text-sm font-semibold whitespace-nowrap border-r border-gray-700 shrink-0 min-w-[180px]"
+                          className="px-4 py-5 text-center text-xs font-black uppercase tracking-widest whitespace-nowrap border-r border-gray-800 last:border-0 min-w-[200px]"
                         >
                           {time}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-white divide-y divide-gray-100">
                     {timetableData.days.map((day, dayIndex) => (
                       <tr
                         key={dayIndex}
-                        className="hover:bg-blue-50/30 transition-colors"
+                        className="hover:bg-blue-50/20 transition-colors group"
                       >
-                        <td className="px-4 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-center border-r border-gray-200 bg-gray-50 sticky left-0 z-10">
+                        <td className="px-4 py-6 whitespace-nowrap text-sm font-black text-gray-900 text-center border-r border-gray-100 bg-gray-50 sticky left-0 z-10 group-hover:bg-blue-50 transition-colors">
                           {day.name}
                         </td>
                         {day.slots.map((slot, slotIndex) => {
@@ -260,83 +254,95 @@ const Timetable = () => {
                           return (
                             <td
                               key={slotIndex}
-                              className="p-2 border-r border-gray-200 last:border-0 align-top"
+                              className="p-3 border-r border-gray-100 last:border-0 align-top"
                             >
-                              <div className="flex flex-col space-y-2">
-                                <input
-                                  type="text"
-                                  placeholder="Subject"
-                                  value={slot.subject}
-                                  onChange={(e) =>
-                                    handleSlotChange(
-                                      dayIndex,
-                                      slotIndex,
-                                      "subject",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder-gray-400 font-medium"
-                                  required
-                                />
-                                <select
-                                  value={slot.time}
-                                  onChange={(e) =>
-                                    handleSlotChange(
-                                      dayIndex,
-                                      slotIndex,
-                                      "time",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer bg-white"
-                                  required
-                                >
-                                  <option value="">Select Time</option>
-                                  <option value={timeSlots[slotIndex]}>
-                                    {timeSlots[slotIndex]}
-                                  </option>
-                                </select>
-                                <select
-                                  value={slot.teacher}
-                                  onChange={(e) =>
-                                    handleSlotChange(
-                                      dayIndex,
-                                      slotIndex,
-                                      "teacher",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100 disabled:text-gray-400 cursor-pointer bg-white"
-                                  required
-                                  disabled={!slot.time}
-                                >
-                                  <option value="">Select Teacher</option>
-                                  {availableTeachers.map((teacher) => (
-                                    <option key={teacher} value={teacher}>
-                                      {teacher}
-                                    </option>
-                                  ))}
-                                </select>
-                                <select
-                                  value={slot.type}
-                                  onChange={(e) =>
-                                    handleSlotChange(
-                                      dayIndex,
-                                      slotIndex,
-                                      "type",
-                                      e.target.value,
-                                    )
-                                  }
-                                  className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all cursor-pointer bg-white"
-                                  required
-                                >
-                                  <option value="">Select Type</option>
-                                  {classTypes.map((type) => (
-                                    <option key={type} value={type}>
-                                      {type}
-                                    </option>
-                                  ))}
-                                </select>
+                              <div className="flex flex-col space-y-3">
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Subject</label>
+                                  <input
+                                    type="text"
+                                    placeholder="e.g. Mathematics"
+                                    value={slot.subject}
+                                    onChange={(e) =>
+                                      handleSlotChange(
+                                        dayIndex,
+                                        slotIndex,
+                                        "subject",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="w-full px-3 py-2.5 border-2 border-gray-100 rounded-xl text-sm focus:border-blue-500 outline-none transition-all placeholder-gray-300 font-bold"
+                                    required
+                                  />
+                                </div>
+
+                                <div className="space-y-1">
+                                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Teacher</label>
+                                  <select
+                                    value={slot.teacher}
+                                    onChange={(e) =>
+                                      handleSlotChange(
+                                        dayIndex,
+                                        slotIndex,
+                                        "teacher",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className="w-full px-3 py-2.5 border-2 border-gray-100 rounded-xl text-sm focus:border-blue-500 outline-none transition-all disabled:bg-gray-50 disabled:text-gray-300 cursor-pointer bg-white font-bold"
+                                    required
+                                    disabled={!slot.time}
+                                  >
+                                    <option value="">Select Faculty</option>
+                                    {availableTeachers.map((teacher) => (
+                                      <option key={teacher} value={teacher}>
+                                        {teacher}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Time</label>
+                                    <select
+                                      value={slot.time}
+                                      onChange={(e) =>
+                                        handleSlotChange(
+                                          dayIndex,
+                                          slotIndex,
+                                          "time",
+                                          e.target.value,
+                                        )
+                                      }
+                                      className="w-full px-2 py-2 border-2 border-gray-100 rounded-xl text-[11px] focus:border-blue-500 outline-none cursor-pointer bg-white font-black"
+                                      required
+                                    >
+                                      <option value="">Time</option>
+                                      <option value={timeSlots[slotIndex]}>{timeSlots[slotIndex]}</option>
+                                    </select>
+                                  </div>
+                                  <div className="space-y-1">
+                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Type</label>
+                                    <select
+                                      value={slot.type}
+                                      onChange={(e) =>
+                                        handleSlotChange(
+                                          dayIndex,
+                                          slotIndex,
+                                          "type",
+                                          e.target.value,
+                                        )
+                                      }
+                                      className="w-full px-2 py-2 border-2 border-gray-100 rounded-xl text-[11px] focus:border-blue-500 outline-none cursor-pointer bg-white font-black"
+                                      required
+                                    >
+                                      <option value="">Type</option>
+                                      {classTypes.map((type) => (
+                                        <option key={type} value={type}>{type}</option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>
                               </div>
                             </td>
                           );
@@ -356,14 +362,6 @@ const Timetable = () => {
               >
                 {isSubmitting ? "Saving Timetable..." : "Save Timetable"}
               </button>
-
-              {submitStatus && (
-                <div
-                  className={`mt-6 p-4 rounded-xl font-medium text-center ${submitStatus.success ? "bg-green-100 text-green-800 border border-green-200" : "bg-red-100 text-red-800 border border-red-200"}`}
-                >
-                  {submitStatus.message}
-                </div>
-              )}
             </div>
           </form>
         </div>

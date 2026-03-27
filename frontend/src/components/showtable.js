@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import html2pdf from "html2pdf.js";
 import API_URL from "../config";
+import { toast } from "react-toastify";
 
 
 const Showtable = () => {
@@ -41,6 +42,7 @@ const Showtable = () => {
         setFilteredTimetables(response.data.data || []);
       } catch (err) {
         setError(err.message || "Something went wrong");
+        toast.error("Failed to load timetables");
       } finally {
         setLoading(false);
       }
@@ -88,7 +90,10 @@ const Showtable = () => {
       html2canvas: { scale: 2 },
       jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
     };
+    
+    toast.info("Preparing your PDF download...");
     html2pdf().set(opt).from(element).save();
+    toast.success("Download started!");
   };
 
   if (loading)
@@ -130,23 +135,23 @@ const Showtable = () => {
         </div>
 
         {/* Filters Card */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 ring-1 ring-gray-100 p-6 mb-10">
-          <div className="flex items-center gap-3 mb-5">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl border border-white/50 ring-1 ring-gray-100 p-5 sm:p-6 mb-8 sm:mb-10">
+          <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
               <i className="fas fa-filter text-blue-600"></i>
             </div>
             <h2 className="text-lg font-black text-gray-900">Filter Schedules</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-end">
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
                 Semester
               </label>
               <select
                 name="semester"
                 value={filters.semester}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all outline-none font-medium appearance-none"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all outline-none font-medium appearance-none"
               >
                 <option value="">All Semesters</option>
                 {Array.from({ length: 8 }, (_, i) => i + 1).map((sem) => (
@@ -158,14 +163,14 @@ const Showtable = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
                 Class
               </label>
               <select
                 name="class"
                 value={filters.class}
                 onChange={handleFilterChange}
-                className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all outline-none font-medium appearance-none"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all outline-none font-medium appearance-none"
               >
                 <option value="">All Classes</option>
                 {Object.keys(classBranches).map((cls) => (
@@ -177,7 +182,7 @@ const Showtable = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
                 Branch
               </label>
               <select
@@ -185,7 +190,7 @@ const Showtable = () => {
                 value={filters.branch}
                 onChange={handleFilterChange}
                 disabled={!filters.class}
-                className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all outline-none font-medium disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
+                className="w-full px-4 py-3 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:bg-white transition-all outline-none font-medium disabled:opacity-50 disabled:cursor-not-allowed appearance-none"
               >
                 <option value="">All Branches</option>
                 {filters.class &&
@@ -200,67 +205,69 @@ const Showtable = () => {
             <button
               type="button"
               onClick={resetFilters}
-              className="px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
+              className="w-full px-6 py-3.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 flex items-center justify-center gap-2"
             >
               <i className="fas fa-undo text-sm"></i>
-              Reset
+              Reset Filters
             </button>
           </div>
         </div>
 
         {filteredTimetables.length === 0 ? (
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 ring-1 ring-gray-100 p-16 text-center">
-            <i className="fas fa-calendar-times text-5xl text-gray-300 mb-4"></i>
-            <p className="text-gray-500 text-lg font-medium">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/50 ring-1 ring-gray-100 p-12 md:p-20 text-center">
+            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i className="fas fa-calendar-times text-4xl text-gray-300"></i>
+            </div>
+            <p className="text-gray-500 text-lg font-medium max-w-sm mx-auto">
               {timetables.length > 0
-                ? "No timetables match the selected filters"
-                : "No timetable data available"}
+                ? "We couldn't find any timetables matching your current filters."
+                : "No timetable data has been uploaded to the system yet."}
             </p>
           </div>
         ) : (
-          <div className="space-y-10">
+          <div className="space-y-8 sm:space-y-12">
             {filteredTimetables.map((table, index) => (
               <div
                 key={index}
-                className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 ring-1 ring-gray-100 overflow-hidden"
+                className="bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden transition-all duration-500 hover:shadow-blue-500/10"
                 ref={(el) => (tableRefs.current[index] = el)}
               >
-                <div className="px-6 sm:px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white flex flex-col md:flex-row justify-between items-center gap-4">
-                  <div className="flex flex-wrap items-center gap-3 text-sm">
-                    <span className="bg-blue-100 text-blue-800 font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5">
-                      <i className="fas fa-layer-group text-xs"></i>
+                <div className="px-6 sm:px-8 py-6 sm:py-7 border-b border-gray-100 bg-gray-50/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm">
+                      <i className="fas fa-layer-group"></i>
                       Sem {table.semester}
                     </span>
-                    <span className="bg-purple-100 text-purple-800 font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5">
-                      <i className="fas fa-users text-xs"></i>
+                    <span className="bg-white text-gray-700 border-2 border-gray-100 font-bold px-4 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm">
+                      <i className="fas fa-users text-blue-500"></i>
                       {table.class}
                     </span>
-                    <span className="bg-indigo-100 text-indigo-800 font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5">
-                      <i className="fas fa-code-branch text-xs"></i>
+                    <span className="bg-white text-gray-700 border-2 border-gray-100 font-bold px-4 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm">
+                      <i className="fas fa-code-branch text-purple-500"></i>
                       {table.branch}
                     </span>
                   </div>
                   <button
                     onClick={() => downloadPDF(index)}
-                    className="group px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-bold shadow-lg shadow-green-500/20 transition-all duration-300 text-sm whitespace-nowrap flex items-center gap-2"
+                    className="w-full md:w-auto group px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-bold shadow-lg shadow-green-500/20 transition-all duration-300 text-sm flex items-center justify-center gap-2"
                   >
                     <i className="fas fa-file-pdf"></i>
-                    Download PDF
-                    <i className="fas fa-download group-hover:translate-y-0.5 transition-transform text-xs"></i>
+                    Export as PDF
+                    <i className="fas fa-download group-hover:translate-y-0.5 transition-transform"></i>
                   </button>
                 </div>
 
-                <div className="overflow-x-auto p-6 sm:p-8">
-                  <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto p-4 sm:p-8 custom-scrollbar">
+                  <table className="min-w-[800px] w-full border-separate border-spacing-0 rounded-2xl border border-gray-200 overflow-hidden">
                     <thead>
-                      <tr className="bg-gradient-to-r from-gray-900 to-gray-800">
-                        <th className="px-6 py-4 text-center text-xs font-bold text-white uppercase tracking-wider bg-gray-900 border-r border-gray-700">
-                          <i className="fas fa-calendar-day mr-2"></i>Day
+                      <tr className="bg-gray-900">
+                        <th className="px-6 py-5 text-center text-xs font-black text-white uppercase tracking-widest border-r border-gray-800/50">
+                          Day
                         </th>
                         {timeSlots.map((time, i) => (
                           <th
                             key={i}
-                            className="px-3 py-4 text-center text-xs font-bold text-gray-300 whitespace-nowrap border-r border-gray-700 last:border-0 uppercase tracking-wide"
+                            className="px-4 py-5 text-center text-[10px] md:text-xs font-black text-gray-400 border-r border-gray-800/50 last:border-0 uppercase tracking-widest"
                           >
                             {time}
                           </th>
@@ -271,42 +278,40 @@ const Showtable = () => {
                       {table.days.map((day, dIdx) => (
                         <tr
                           key={dIdx}
-                          className={`${dIdx % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-blue-50/30 transition-colors`}
+                          className={`${dIdx % 2 === 0 ? "bg-white" : "bg-gray-50/30"} hover:bg-blue-50/50 transition-colors group`}
                         >
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-black text-gray-900 bg-gray-50 border-r border-gray-200 text-center">
+                          <td className="px-6 py-6 whitespace-nowrap text-sm font-black text-gray-900 bg-gray-50/50 border-r border-gray-200 text-center sticky left-0 z-10 group-hover:bg-blue-50 transition-colors">
                             {day.name}
                           </td>
                           {day.slots.map((slot, sIdx) => (
                             <td
                               key={sIdx}
-                              className="px-3 py-4 text-center border-r border-gray-100 last:border-0"
+                              className="px-4 py-6 text-center border-r border-gray-100 last:border-0 min-w-[140px]"
                             >
                               {slot.subject ? (
-                                <div className="flex flex-col items-center justify-center space-y-1.5">
-                                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                                    slot.type === "Lab"
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                  <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-tighter ${
+                                    slot.type === "Lab" || slot.type === "Practical"
                                       ? "bg-purple-100 text-purple-700"
                                       : "bg-green-100 text-green-700"
                                   }`}>
                                     {slot.type || "Lecture"}
                                   </span>
                                   <strong
-                                    className="text-gray-900 text-sm block truncate max-w-[140px]"
+                                    className="text-gray-900 text-sm block leading-tight font-extrabold"
                                     title={slot.subject}
                                   >
                                     {slot.subject}
                                   </strong>
-                                  <span
-                                    className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-bold truncate max-w-[140px]"
-                                    title={slot.teacher}
-                                  >
-                                    {slot.teacher || "TBA"}
-                                  </span>
+                                  <div className="flex items-center gap-1.5 text-blue-600 bg-blue-50/50 px-2.5 py-1 rounded-lg">
+                                    <i className="fas fa-user-circle text-[10px]"></i>
+                                    <span className="text-[10px] font-bold uppercase truncate max-w-[100px]" title={slot.teacher}>
+                                      {slot.teacher || "TBA"}
+                                    </span>
+                                  </div>
                                 </div>
                               ) : (
-                                <span className="text-gray-300 italic text-sm">
-                                  —
-                                </span>
+                                <span className="text-gray-200 font-light">—</span>
                               )}
                             </td>
                           ))}

@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import context from "./context";
 import API_URL from "../config";
+import { toast } from "react-toastify";
 
 
 const Login = () => {
@@ -27,16 +28,16 @@ const Login = () => {
       const res = await result.json();
 
       if (res.statuscode === 1) {
-        alert("Login successful");
+        toast.success("Login successful! Welcome back.");
         localStorage.setItem("flag", res.utype);
         setflag(res.utype);
         navigate("/");
       } else {
-        alert("Invalid email or password");
+        toast.error("Invalid email or password. Please try again.");
       }
     } catch (err) {
       console.log(err);
-      alert("Server error");
+      toast.error("Server error. Please try again later.");
     }
   };
 

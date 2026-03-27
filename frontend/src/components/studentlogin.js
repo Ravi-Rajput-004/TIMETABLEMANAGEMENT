@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import API_URL from "../config";
+import { toast } from "react-toastify";
 
 
 const StudentLogin = () => {
@@ -55,10 +56,12 @@ const StudentLogin = () => {
         throw new Error(data.message || "Login failed");
       }
 
+      toast.success(`Welcome back, ${data.data.name}!`);
       setStudentDetails(data.data);
       localStorage.setItem("student", JSON.stringify(data.data));
     } catch (error) {
       setError(error.message);
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -116,6 +119,7 @@ const StudentLogin = () => {
     localStorage.removeItem("student");
     setStudentDetails(null);
     setTimetable(null);
+    toast.info("Logged out from student dashboard");
   };
 
   return (
@@ -253,48 +257,50 @@ const StudentLogin = () => {
           </div>
 
           {/* Timetable Section */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 ring-1 ring-gray-100 overflow-hidden">
-            <div className="px-6 sm:px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white flex items-center justify-between">
+          <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+            <div className="px-6 sm:px-8 py-6 border-b border-gray-100 bg-gray-50/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <i className="fas fa-calendar-alt text-blue-600"></i>
+                <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                  <i className="fas fa-calendar-alt text-white text-sm"></i>
                 </div>
                 <h3 className="text-xl font-black text-gray-900">
-                  Your Timetable
+                  Your Weekly Schedule
                 </h3>
               </div>
-              <span className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
-                {studentDetails.class} - Sem {studentDetails.semester}
+              <span className="bg-blue-50 text-blue-700 text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest border border-blue-100">
+                {studentDetails.class} · Sem {studentDetails.semester}
               </span>
             </div>
 
-            <div className="p-6 sm:p-8">
+            <div className="p-4 sm:p-8">
               {loadingTimetable ? (
-                <div className="flex flex-col justify-center items-center py-16 gap-4">
-                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
-                  <p className="text-gray-500 font-medium">Loading your schedule...</p>
+                <div className="flex flex-col justify-center items-center py-20 gap-4">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-100 border-t-blue-600"></div>
+                  <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Fetching Schedule...</p>
                 </div>
               ) : timetableError ? (
-                <div className="p-6 rounded-2xl bg-red-50 border border-red-100 text-red-700 text-center font-medium flex items-center gap-3 justify-center">
-                  <i className="fas fa-exclamation-triangle text-red-500"></i>
-                  {timetableError}
+                <div className="p-10 rounded-2xl bg-red-50 border border-red-100 text-red-700 text-center font-bold flex flex-col items-center gap-4">
+                  <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+                    <i className="fas fa-exclamation-triangle text-2xl"></i>
+                  </div>
+                  <p className="max-w-sm mx-auto">{timetableError}</p>
                 </div>
               ) : timetable ? (
-                <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
-                  <table className="min-w-full divide-y divide-gray-200">
+                <div className="overflow-x-auto custom-scrollbar rounded-2xl border border-gray-100 shadow-sm">
+                  <table className="min-w-[800px] w-full border-separate border-spacing-0">
                     <thead>
-                      <tr className="bg-gradient-to-r from-gray-900 to-gray-800">
+                      <tr className="bg-gray-900">
                         <th
                           scope="col"
-                          className="py-4 pl-6 pr-3 text-left text-xs font-bold text-white uppercase tracking-wider bg-gray-900 border-r border-gray-700"
+                          className="py-5 px-6 text-center text-xs font-black text-white uppercase tracking-widest border-r border-gray-800 bg-gray-900 sticky left-0 z-20"
                         >
-                          <i className="fas fa-calendar-day mr-2"></i>Day
+                          Day
                         </th>
                         {timeSlots.map((time, i) => (
                           <th
                             key={i}
                             scope="col"
-                            className="px-3 py-4 text-center text-xs font-bold text-gray-300 whitespace-nowrap border-r border-gray-700 last:border-0 uppercase tracking-wide"
+                            className="px-4 py-5 text-center text-[10px] font-black text-gray-400 border-r border-gray-800 last:border-0 uppercase tracking-widest"
                           >
                             {time}
                           </th>
@@ -305,40 +311,40 @@ const StudentLogin = () => {
                       {timetable.days.map((day, dIdx) => (
                         <tr
                           key={dIdx}
-                          className={`${dIdx % 2 === 0 ? "bg-white" : "bg-gray-50/50"} hover:bg-blue-50/30 transition-colors`}
+                          className={`${dIdx % 2 === 0 ? "bg-white" : "bg-gray-50/20"} hover:bg-blue-50/50 transition-colors group`}
                         >
-                          <td className="whitespace-nowrap py-5 pl-6 pr-3 text-sm font-black text-gray-900 border-r border-gray-100 bg-gray-50">
+                          <td className="whitespace-nowrap py-6 px-6 text-sm font-black text-gray-900 border-r border-gray-100 bg-gray-50/50 sticky left-0 z-10 group-hover:bg-blue-50 transition-colors text-center">
                             {day.name}
                           </td>
                           {day.slots.map((slot, sIdx) => (
                             <td
                               key={sIdx}
-                              className="whitespace-nowrap px-3 py-4 text-sm text-center border-r border-gray-100 last:border-0"
+                              className="px-4 py-6 text-center border-r border-gray-100 last:border-0 min-w-[150px]"
                             >
                               {slot.subject ? (
-                                <div className="flex flex-col items-center justify-center space-y-1.5">
-                                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                                    slot.type === "Lab"
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                  <span className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+                                    slot.type === "Lab" || slot.type === "Practical"
                                       ? "bg-purple-100 text-purple-700"
                                       : "bg-blue-100 text-blue-700"
                                   }`}>
                                     {slot.type || "Lecture"}
                                   </span>
                                   <strong
-                                    className="text-gray-900 block truncate max-w-[120px]"
+                                    className="text-gray-900 text-sm block leading-tight font-extrabold"
                                     title={slot.subject}
                                   >
                                     {slot.subject}
                                   </strong>
-                                  <span
-                                    className="text-xs text-gray-500 truncate max-w-[120px]"
-                                    title={slot.teacher}
-                                  >
-                                    {slot.teacher}
-                                  </span>
+                                  <div className="flex items-center gap-1 text-gray-400">
+                                    <i className="fas fa-user-circle text-[10px]"></i>
+                                    <span className="text-[10px] font-bold uppercase truncate max-w-[110px]" title={slot.teacher}>
+                                      {slot.teacher}
+                                    </span>
+                                  </div>
                                 </div>
                               ) : (
-                                <span className="text-gray-300">—</span>
+                                <span className="text-gray-200 font-light">—</span>
                               )}
                             </td>
                           ))}
@@ -348,9 +354,11 @@ const StudentLogin = () => {
                   </table>
                 </div>
               ) : (
-                <div className="p-12 text-center">
-                  <i className="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
-                  <p className="text-gray-500 font-medium">No timetable found</p>
+                <div className="p-20 text-center">
+                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i className="fas fa-calendar-times text-4xl text-gray-200"></i>
+                  </div>
+                  <p className="text-gray-500 font-extrabold uppercase text-xs tracking-widest">No Schedule Data</p>
                 </div>
               )}
             </div>

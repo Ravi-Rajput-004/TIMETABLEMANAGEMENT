@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API_URL from "../config";
+import { toast } from "react-toastify";
 
 
 const Signup = () => {
   const [name, setname] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const navigate = useNavigate();
 
   const submit = async (e) => {
     e.preventDefault();
@@ -24,13 +26,15 @@ const Signup = () => {
       console.log("📥 Response status:", result.status);
 
       if (result.ok) {
-        alert("Account created successfully!");
+        toast.success("Account created successfully! You can now login.");
+        setTimeout(() => navigate("/login"), 1500);
       } else {
-        alert("Failed to create account");
+        const errorData = await result.json();
+        toast.error(errorData.message || "Failed to create account. Please try again.");
       }
     } catch (error) {
       console.log(error);
-      alert("Server error");
+      toast.error("Server error. Please try again later.");
     }
   };
 

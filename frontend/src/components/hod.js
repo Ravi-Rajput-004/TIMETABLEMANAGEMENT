@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API_URL from "../config";
+import { toast } from "react-toastify";
 
 
 const Hod = () => {
@@ -11,7 +12,6 @@ const Hod = () => {
     specialization: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState({ text: "", type: "" });
 
   useEffect(() => {
     fetchTeachers();
@@ -27,7 +27,7 @@ const Hod = () => {
       const data = await response.json();
       setTeachers(data.data);
     } catch (error) {
-      setMessage({ text: error.message, type: "error" });
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +55,7 @@ const Hod = () => {
         throw new Error("Failed to add teacher");
       }
 
-      setMessage({ text: "Teacher added successfully!", type: "success" });
+      toast.success("Teacher added successfully!");
       setNewTeacher({
         name: "",
         email: "",
@@ -64,7 +64,7 @@ const Hod = () => {
       });
       fetchTeachers();
     } catch (error) {
-      setMessage({ text: error.message, type: "error" });
+       toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -100,15 +100,6 @@ const Hod = () => {
               Add New Teacher
             </h2>
           </div>
-
-          {message.text && (
-            <div
-              className={`mb-6 p-4 rounded-xl font-semibold flex items-center gap-3 ${message.type === "error" ? "bg-red-50 text-red-700 border border-red-200" : "bg-green-50 text-green-700 border border-green-200"}`}
-            >
-              <i className={`fas ${message.type === "error" ? "fa-exclamation-circle" : "fa-check-circle"}`}></i>
-              {message.text}
-            </div>
-          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -210,47 +201,49 @@ const Hod = () => {
         </div>
 
         {/* Teacher Directory */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 ring-1 ring-gray-100 overflow-hidden">
-          <div className="px-8 py-5 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white flex justify-between items-center">
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+          <div className="px-6 sm:px-8 py-6 border-b border-gray-100 bg-gray-50/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                <i className="fas fa-users text-indigo-600"></i>
+              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i className="fas fa-users text-white text-sm"></i>
               </div>
               <h2 className="text-xl font-black text-gray-900">
                 Faculty Directory
               </h2>
             </div>
-            <span className="bg-blue-100 text-blue-700 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider">
-              {teachers.length} Members
+            <span className="bg-indigo-50 text-indigo-700 text-[10px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest border border-indigo-100">
+              {teachers.length} Active Members
             </span>
           </div>
 
           {isLoading ? (
-            <div className="flex flex-col justify-center items-center py-16 gap-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-200 border-t-blue-600"></div>
-              <p className="text-gray-500 font-medium">Loading faculty...</p>
+            <div className="flex flex-col justify-center items-center py-20 gap-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-100 border-t-indigo-600"></div>
+              <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">Loading Records...</p>
             </div>
           ) : teachers.length === 0 ? (
-            <div className="text-center py-16">
-              <i className="fas fa-user-slash text-4xl text-gray-300 mb-4"></i>
-              <p className="text-gray-500 font-medium">No teachers added yet. Start by adding one above!</p>
+            <div className="text-center py-20 px-6">
+              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fas fa-user-slash text-3xl text-gray-300"></i>
+              </div>
+              <p className="text-gray-500 font-medium max-w-xs mx-auto">No teachers have been added to the directory yet.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-100">
+            <div className="overflow-x-auto custom-scrollbar">
+              <table className="min-w-[700px] w-full border-separate border-spacing-0">
                 <thead>
-                  <tr className="bg-gradient-to-r from-gray-50 to-gray-100/50">
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">
-                      <i className="fas fa-user mr-2 text-gray-400"></i>Name
+                  <tr className="bg-white">
+                    <th scope="col" className="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                      Faculty Member
                     </th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">
-                      <i className="fas fa-envelope mr-2 text-gray-400"></i>Email
+                    <th scope="col" className="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                      Contact Information
                     </th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">
-                      <i className="fas fa-building mr-2 text-gray-400"></i>Department
+                    <th scope="col" className="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                      Department
                     </th>
-                    <th scope="col" className="px-6 py-4 text-left text-xs font-black text-gray-500 uppercase tracking-wider">
-                      <i className="fas fa-flask mr-2 text-gray-400"></i>Specialization
+                    <th scope="col" className="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                      Specialization
                     </th>
                   </tr>
                 </thead>
@@ -258,26 +251,32 @@ const Hod = () => {
                   {teachers.map((teacher, idx) => (
                     <tr
                       key={teacher._id}
-                      className="hover:bg-blue-50/50 transition-colors"
+                      className="hover:bg-indigo-50/30 transition-colors group"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md group-hover:scale-110 transition-transform">
                             {teacher.name.charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-sm font-bold text-gray-900">{teacher.name}</span>
+                          <span className="text-sm font-extrabold text-gray-900">{teacher.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
-                        {teacher.email}
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <i className="fas fa-envelope text-xs text-indigo-400"></i>
+                          <span className="text-sm font-medium">{teacher.email}</span>
+                        </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-indigo-100 text-indigo-700">
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <span className="px-3 py-1 inline-flex text-[10px] font-black rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-tighter">
                           {teacher.department}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 font-medium">
-                        {teacher.specialization}
+                      <td className="px-6 py-6 whitespace-nowrap">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <i className="fas fa-award text-xs text-amber-500"></i>
+                          <span className="text-sm font-bold">{teacher.specialization}</span>
+                        </div>
                       </td>
                     </tr>
                   ))}
