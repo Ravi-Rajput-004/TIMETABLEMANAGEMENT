@@ -58,6 +58,7 @@ const Siteroutes = () => {
         />
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/login" element={<Login />}></Route>
+        <Route path="/coming-soon" element={<ComingSoon />}></Route>
 
         {/* Catch-all route */}
         <Route path="*" element={<ComingSoon />}></Route>
