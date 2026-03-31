@@ -248,9 +248,9 @@ const LandingPage = () => {
               </p>
               <div className="flex gap-3">
                 {[ "twitter", "linkedin-in", "github" ].map(social => (
-                  <a key={social} href="#" className="w-10 h-10 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all">
+                  <Link key={social} to="/coming-soon" className="w-10 h-10 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-center text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 transition-all">
                     <i className={`fab fa-${social}`}></i>
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -260,7 +260,7 @@ const LandingPage = () => {
               <ul className="space-y-3">
                 {["Features", "Enterprise", "Security", "Pricing"].map(item => (
                   <li key={item}>
-                    <Link to="/" className="text-slate-500 hover:text-indigo-600 font-medium transition-colors text-sm">{item}</Link>
+                    <Link to="/coming-soon" className="text-slate-500 hover:text-indigo-600 font-medium transition-colors text-sm">{item}</Link>
                   </li>
                 ))}
               </ul>
@@ -271,7 +271,7 @@ const LandingPage = () => {
               <ul className="space-y-3">
                 {["Documentation", "API Reference", "Support Center", "Status"].map(item => (
                   <li key={item}>
-                    <Link to="/" className="text-slate-500 hover:text-indigo-600 font-medium transition-colors text-sm">{item}</Link>
+                    <Link to="/coming-soon" className="text-slate-500 hover:text-indigo-600 font-medium transition-colors text-sm">{item}</Link>
                   </li>
                 ))}
               </ul>
@@ -282,7 +282,7 @@ const LandingPage = () => {
               <ul className="space-y-3">
                 {["About", "Careers", "Contact", "Partners"].map(item => (
                   <li key={item}>
-                    <Link to="/" className="text-slate-500 hover:text-indigo-600 font-medium transition-colors text-sm">{item}</Link>
+                    <Link to="/coming-soon" className="text-slate-500 hover:text-indigo-600 font-medium transition-colors text-sm">{item}</Link>
                   </li>
                 ))}
               </ul>
@@ -294,8 +294,8 @@ const LandingPage = () => {
               © {new Date().getFullYear()} TimetableHub Inc. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <Link to="/" className="text-slate-500 hover:text-indigo-600 text-sm font-medium transition-colors">Privacy Policy</Link>
-              <Link to="/" className="text-slate-500 hover:text-indigo-600 text-sm font-medium transition-colors">Terms of Service</Link>
+              <Link to="/coming-soon" className="text-slate-500 hover:text-indigo-600 text-sm font-medium transition-colors">Privacy Policy</Link>
+              <Link to="/coming-soon" className="text-slate-500 hover:text-indigo-600 text-sm font-medium transition-colors">Terms of Service</Link>
             </div>
           </div>
         </div>
