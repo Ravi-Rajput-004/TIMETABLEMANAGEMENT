@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import html2pdf from "html2pdf.js";
 import API_URL from "../config";
-import { toast } from "react-toastify";
+import { showAlert, showToast, showConfirm } from "../utils/alerts";
 
 
 const Showtable = () => {
@@ -15,6 +16,8 @@ const Showtable = () => {
     class: "",
     branch: "",
   });
+
+  const navigate = useNavigate();
 
   const tableRefs = useRef([]);
 
@@ -35,21 +38,37 @@ const Showtable = () => {
   ];
 
   useEffect(() => {
-    const fetchTimetables = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/timetables`);
-        setTimetables(response.data.data || []);
-        setFilteredTimetables(response.data.data || []);
-      } catch (err) {
-        setError(err.message || "Something went wrong");
-        toast.error("Failed to load timetables");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchTimetables();
   }, []);
+
+  const fetchTimetables = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/timetables`);
+      setTimetables(response.data.data || []);
+      setFilteredTimetables(response.data.data || []);
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+      showAlert("error", "Error", "Failed to load timetables");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (table) => {
+    navigate("/timetable", { state: { editData: table } });
+  };
+
+  const handleDelete = async (id) => {
+    const isConfirmed = await showConfirm("Confirm Deletion", "Are you sure you want to delete this timetable?");
+    if (!isConfirmed) return;
+    try {
+      await axios.delete(`${API_URL}/api/timetables/${id}`);
+      showToast("success", "Timetable deleted successfully");
+      fetchTimetables();
+    } catch (err) {
+      showAlert("error", "Error", "Failed to delete timetable");
+    }
+  };
 
   useEffect(() => {
     const filtered = timetables.filter((table) => {
@@ -91,9 +110,9 @@ const Showtable = () => {
       jsPDF: { unit: "in", format: "letter", orientation: "landscape" },
     };
     
-    toast.info("Preparing your PDF download...");
+    showToast("info", "Preparing your PDF download...");
     html2pdf().set(opt).from(element).save();
-    toast.success("Download started!");
+    showToast("success", "Download started!");
   };
 
   if (loading)
@@ -234,6 +253,23 @@ const Showtable = () => {
               >
                 <div className="px-6 sm:px-8 py-6 sm:py-7 border-b border-gray-100 bg-gray-50/30 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                   <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEdit(table)}
+                        className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition-colors shadow-sm"
+                        title="Edit Timetable"
+                      >
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(table._id)}
+                        className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 flex items-center justify-center transition-colors shadow-sm"
+                        title="Delete Timetable"
+                      >
+                        <i className="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                    <div className="h-8 w-px bg-gray-200 mx-1 hidden md:block"></div>
                     <span className="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl flex items-center gap-2 text-xs md:text-sm">
                       <i className="fas fa-layer-group"></i>
                       Sem {table.semester}

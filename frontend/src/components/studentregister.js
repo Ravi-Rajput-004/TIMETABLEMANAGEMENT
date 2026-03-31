@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API_URL from "../config";
-import { toast } from "react-toastify";
+import { showToast, showAlert } from "../utils/alerts";
 
 
 const StudentRegister = () => {
@@ -38,7 +38,7 @@ const StudentRegister = () => {
     e.preventDefault();
 
     if (studentData.password !== studentData.confirmPassword) {
-      toast.error("Passwords do not match!");
+      showAlert("warning", "Password Mismatch", "The passwords you entered do not match. Please try again.");
       return;
     }
 
@@ -57,51 +57,52 @@ const StudentRegister = () => {
 
       if (!response.ok) throw new Error(data.message || "Registration failed");
 
-      toast.success("Registration successful! Redirecting to login...");
+      showAlert("success", "Account Created!", "Registration successful! Redirecting you to the student portal...");
 
       setTimeout(() => {
         navigate("/studentlogin");
       }, 2000);
     } catch (error) {
-      toast.error(error.message);
+      showAlert("error", "Registration Failed", error.message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 md:py-16 px-4 md:px-8 relative overflow-hidden">
-      {/* Decorative Background */}
-      <div className="absolute top-[-5%] left-[-10%] w-64 md:w-96 h-64 md:h-96 bg-green-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-      <div className="absolute bottom-[-10%] right-[-5%] w-64 md:w-96 h-64 md:h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    <div className="flex justify-center items-center min-h-[calc(100vh-80px)] bg-slate-50 py-8 md:py-16 px-4 md:px-8 relative overflow-hidden">
+      {/* Decorative Grid Background */}
+      <div className="absolute inset-0 z-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, black 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
+      <div className="absolute top-[-5%] left-[-10%] w-64 md:w-96 h-64 md:h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+      <div className="absolute bottom-[-10%] right-[-5%] w-64 md:w-96 h-64 md:h-96 bg-violet-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
 
       <div className="relative z-10 max-w-2xl w-full">
         {/* Brand Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-600 to-teal-700 rounded-2xl shadow-xl shadow-green-500/20 mb-6">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl shadow-indigo-500/20 mb-6">
             <i className="fas fa-user-graduate text-white text-2xl"></i>
           </div>
-          <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tight mb-3">
+          <h1 className="heading-lg text-slate-900 mb-2">
              Student Join
           </h1>
-          <p className="text-gray-500 font-bold uppercase text-[10px] md:text-xs tracking-widest px-4">
+          <p className="text-slate-500 font-bold uppercase text-[10px] md:text-xs tracking-widest px-4">
              Unlock your digital academic schedule
           </p>
         </div>
 
-        <div className="bg-white/90 backdrop-blur-2xl p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border border-white/50 ring-1 ring-gray-100/50">
+        <div className="card-premium">
           <form onSubmit={handleSubmit} className="space-y-8 md:space-y-10">
             {/* Section: Personal Info */}
             <div className="space-y-6">
                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center border border-blue-100 shadow-sm">
-                    <i className="fas fa-user text-blue-600 text-[10px]"></i>
+                  <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center border border-indigo-100 shadow-sm">
+                    <i className="fas fa-user text-indigo-600 text-[10px]"></i>
                   </div>
-                  <h2 className="text-xs font-black text-gray-400 uppercase tracking-widest">Personal Details</h2>
+                  <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Personal Details</h2>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">Full Name</label>
+                    <label className="label-base text-[10px] uppercase tracking-tighter">Full Name</label>
                     <input
                       type="text"
                       name="name"
@@ -109,11 +110,11 @@ const StudentRegister = () => {
                       onChange={handleChange}
                       required
                       placeholder="e.g. John Doe"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-green-600 focus:bg-white transition-all outline-none font-bold text-sm"
+                      className="input-base text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">Email ID</label>
+                    <label className="label-base text-[10px] uppercase tracking-tighter">Email ID</label>
                     <input
                       type="email"
                       name="email"
@@ -121,7 +122,7 @@ const StudentRegister = () => {
                       onChange={handleChange}
                       required
                       placeholder="name@college.edu"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-green-600 focus:bg-white transition-all outline-none font-bold text-sm"
+                      className="input-base text-sm"
                     />
                   </div>
                </div>
@@ -130,14 +131,14 @@ const StudentRegister = () => {
             {/* Section: Academic Info */}
             <div className="space-y-6">
                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center border border-green-100 shadow-sm">
-                    <i className="fas fa-graduation-cap text-green-600 text-[10px]"></i>
+                  <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center border border-indigo-100 shadow-sm">
+                    <i className="fas fa-graduation-cap text-indigo-600 text-[10px]"></i>
                   </div>
-                  <h2 className="text-xs font-black text-gray-400 uppercase tracking-widest">Academic Info</h2>
+                  <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Academic Info</h2>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">Roll Number</label>
+                    <label className="label-base text-[10px] uppercase tracking-tighter">Roll Number</label>
                     <input
                       type="text"
                       name="rollNo"
@@ -145,17 +146,17 @@ const StudentRegister = () => {
                       onChange={handleChange}
                       required
                       placeholder="e.g. 21CS001"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-green-600 focus:bg-white transition-all outline-none font-bold text-sm"
+                      className="input-base text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">Semester</label>
+                    <label className="label-base text-[10px] uppercase tracking-tighter">Semester</label>
                     <select
                       name="semester"
                       value={studentData.semester}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-green-600 focus:bg-white transition-all outline-none font-bold text-sm appearance-none"
+                      className="input-base text-sm appearance-none"
                     >
                       <option value="">Select Sem</option>
                       {[1,2,3,4,5,6,7,8].map(s => (
@@ -164,13 +165,13 @@ const StudentRegister = () => {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">Class</label>
+                    <label className="label-base text-[10px] uppercase tracking-tighter">Class</label>
                     <select
                       name="class"
                       value={studentData.class}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-green-600 focus:bg-white transition-all outline-none font-bold text-sm appearance-none"
+                      className="input-base text-sm appearance-none"
                     >
                       <option value="">Select Class</option>
                       {Object.keys(classBranches).map(cls => (
@@ -179,14 +180,14 @@ const StudentRegister = () => {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">Branch</label>
+                    <label className="label-base text-[10px] uppercase tracking-tighter">Branch</label>
                     <select
                       name="branch"
                       value={studentData.branch}
                       onChange={handleChange}
                       required
                       disabled={!studentData.class}
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-green-600 focus:bg-white transition-all outline-none font-bold text-sm disabled:opacity-50 appearance-none"
+                      className="input-base text-sm appearance-none disabled:opacity-50"
                     >
                       <option value="">Select Branch</option>
                       {studentData.class && classBranches[studentData.class].map(b => (
@@ -200,14 +201,14 @@ const StudentRegister = () => {
             {/* Section: Security */}
             <div className="space-y-6">
                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center border border-purple-100 shadow-sm">
-                    <i className="fas fa-lock text-purple-600 text-[10px]"></i>
+                  <div className="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center border border-violet-100 shadow-sm">
+                    <i className="fas fa-lock text-violet-600 text-[10px]"></i>
                   </div>
-                  <h2 className="text-xs font-black text-gray-400 uppercase tracking-widest">Security</h2>
+                  <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest">Security</h2>
                </div>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">Password</label>
+                    <label className="label-base text-[10px] uppercase tracking-tighter">Password</label>
                     <input
                       type="password"
                       name="password"
@@ -215,11 +216,11 @@ const StudentRegister = () => {
                       onChange={handleChange}
                       required
                       minLength="6"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-purple-600 focus:bg-white transition-all outline-none font-bold text-sm"
+                      className="input-base text-sm"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">Verify Password</label>
+                    <label className="label-base text-[10px] uppercase tracking-tighter">Verify Password</label>
                     <input
                       type="password"
                       name="confirmPassword"
@@ -227,7 +228,7 @@ const StudentRegister = () => {
                       onChange={handleChange}
                       required
                       minLength="6"
-                      className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-100 bg-gray-50/50 focus:border-purple-600 focus:bg-white transition-all outline-none font-bold text-sm"
+                      className="input-base text-sm"
                     />
                   </div>
                </div>
@@ -237,7 +238,7 @@ const StudentRegister = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="group w-full py-4 px-6 bg-gradient-to-r from-green-600 to-teal-700 hover:from-green-700 hover:to-teal-800 text-white rounded-2xl font-black shadow-xl shadow-green-500/30 hover:shadow-green-500/40 transition-all duration-300 transform active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-3"
+                className="btn-primary w-full disabled:opacity-70 flex items-center justify-center gap-3 py-4"
               >
                 {isSubmitting ? (
                   <>
@@ -246,23 +247,23 @@ const StudentRegister = () => {
                   </>
                 ) : (
                   <>
-                    <span className="uppercase tracking-widest text-xs">Complete Registration</span>
-                    <i className="fas fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                    <span className="uppercase tracking-widest text-xs font-bold">Complete Registration</span>
+                    <i className="fas fa-arrow-right text-xs"></i>
                   </>
                 )}
               </button>
             </div>
 
-            <div className="pt-8 border-t border-gray-100 flex flex-col items-center gap-3">
-              <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest text-center">
+            <div className="pt-8 border-t border-slate-100 flex flex-col items-center gap-3">
+              <p className="text-slate-400 font-bold uppercase text-[10px] tracking-widest text-center">
                 Already have an academic account?
               </p>
               <Link
                 to="/studentlogin"
-                className="text-green-600 text-sm font-black hover:text-green-700 transition-colors flex items-center gap-1 group"
+                className="text-indigo-600 text-sm font-black hover:text-indigo-700 transition-colors flex items-center gap-1 group"
               >
                 Login to Dashboard
-                <i className="fas fa-chevron-right text-[10px] group-hover:translate-x-1 transition-transform"></i>
+                <i className="fas fa-chevron-right text-[10px] ml-1"></i>
               </Link>
             </div>
           </form>

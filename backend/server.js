@@ -30,7 +30,7 @@ app.use((req, res, next) => {
 
 const signSchema = mongoose.Schema({
   name: String,
-  email: String,
+  email: { type: String, unique: true, required: true },
   password: String,
   utype: String,
 });
@@ -38,18 +38,31 @@ const signSchema = mongoose.Schema({
 const signmodel = mongoose.model("signup", signSchema, "signup");
 
 app.post("/signup", async (req, res) => {
-  const result = new signmodel({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    utype: "user",
-  });
+  try {
+    const existingUser = await signmodel.findOne({ email: req.body.email });
+    if (existingUser) {
+      return res.send({ statuscode: 0, message: "Email already registered" });
+    }
 
-  const data = await result.save();
-  if (data) {
-    res.send({ statuscode: 1 });
-  } else {
-    res.send({ statuscode: 0 });
+    const result = new signmodel({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      utype: "user",
+    });
+
+    const data = await result.save();
+    if (data) {
+      res.send({ statuscode: 1, message: "Signup successful" });
+    } else {
+      res.send({ statuscode: 0, message: "Signup failed" });
+    }
+  } catch (err) {
+    if (err.code === 11000) {
+      res.send({ statuscode: 0, message: "Email already registered" });
+    } else {
+      res.send({ statuscode: 0, message: "Server error" });
+    }
   }
 });
 
@@ -96,6 +109,7 @@ const TimetableSchema = new mongoose.Schema({
 const TeacherSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
+  contact: String,
   department: String,
   specialization: String,
   createdAt: { type: Date, default: Date.now },
@@ -108,11 +122,12 @@ const Teacher = mongoose.model("Teacher", TeacherSchema);
 // Teacher Endpoints
 app.post("/api/teachers", async (req, res) => {
   try {
-    const { name, email, department, specialization } = req.body;
+    const { name, email, contact, department, specialization } = req.body;
 
     const newTeacher = new Teacher({
       name,
       email,
+      contact,
       department,
       specialization,
     });
@@ -124,6 +139,12 @@ app.post("/api/teachers", async (req, res) => {
       data: savedTeacher,
     });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Teacher with this email already exists",
+      });
+    }
     console.error("Error adding teacher:", error);
     res.status(500).json({
       success: false,
@@ -145,6 +166,63 @@ app.get("/api/teachers", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch teachers",
+      error: error.message,
+    });
+  }
+});
+
+app.put("/api/teachers/:id", async (req, res) => {
+  console.log(`📝 Attempting to update teacher ID: ${req.params.id}`);
+  try {
+    const { name, email, contact, department, specialization } = req.body;
+    
+    const updatedTeacher = await Teacher.findByIdAndUpdate(
+      req.params.id,
+      { name, email, contact, department, specialization },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTeacher) {
+      console.log(`❌ Teacher with ID ${req.params.id} not found for update`);
+      return res.status(404).json({ success: false, message: "Teacher not found" });
+    }
+
+    console.log(`✅ Teacher ${updatedTeacher.name} updated successfully`);
+    res.json({
+      success: true,
+      message: "Teacher updated successfully",
+      data: updatedTeacher,
+    });
+  } catch (error) {
+    console.error("❌ Error updating teacher:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update teacher",
+      error: error.message,
+    });
+  }
+});
+
+app.delete("/api/teachers/:id", async (req, res) => {
+  console.log(`🗑️ Attempting to delete teacher ID: ${req.params.id}`);
+  try {
+    const deletedTeacher = await Teacher.findByIdAndDelete(req.params.id);
+    
+    if (!deletedTeacher) {
+      console.log(`❌ Teacher with ID ${req.params.id} not found for deletion`);
+      return res.status(404).json({ success: false, message: "Teacher not found" });
+    }
+
+    console.log(`✅ Teacher deleted successfully`);
+    res.json({
+      success: true,
+      message: "Teacher deleted successfully",
+    });
+  } catch (error) {
+    console.error("❌ Error deleting teacher:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete teacher",
       error: error.message,
     });
   }
@@ -197,6 +275,55 @@ app.get("/api/timetables", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch timetables",
+      error: error.message,
+    });
+  }
+});
+
+app.put("/api/timetables/:id", async (req, res) => {
+  try {
+    const updatedTimetable = await Timetable.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedTimetable) {
+      return res.status(404).json({ success: false, message: "Timetable not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Timetable updated successfully",
+      data: updatedTimetable,
+    });
+  } catch (error) {
+    console.error("Error updating timetable:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update timetable",
+      error: error.message,
+    });
+  }
+});
+
+app.delete("/api/timetables/:id", async (req, res) => {
+  try {
+    const deletedTimetable = await Timetable.findByIdAndDelete(req.params.id);
+    
+    if (!deletedTimetable) {
+      return res.status(404).json({ success: false, message: "Timetable not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Timetable deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting timetable:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete timetable",
       error: error.message,
     });
   }
@@ -362,21 +489,28 @@ app.get("/api/students/:id", async (req, res) => {
   }
 });
 
-// Server setup
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     const conn = mongoose.connection;
     console.log(`🚀 Database connected: ${conn.host}`);
-    console.log(`📁 Database Name: ${conn.name}`);
     console.log("✅ MongoDB Atlas connected successfully");
+    
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
   })
   .catch((err) => {
     console.error("❌ Database connection error:", err);
-    console.log(`⚠️ Attempted URI: ${process.env.MONGO_URI?.split('@')[1] || 'undefined'}`); 
+    process.exit(1); // Exit if DB connection fails
   });
+
+// 🛡️ Global Error Catch-all
+process.on("uncaughtException", (err) => {
+  console.error("🔥 CRITICAL: Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("🌊 CRITICAL: Unhandled Rejection at:", promise, "reason:", reason);
+});

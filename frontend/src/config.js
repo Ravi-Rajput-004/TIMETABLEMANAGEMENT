@@ -1,4 +1,3 @@
-const API_URL = (typeof process !== "undefined" && process.env && process.env.REACT_APP_API_URL) 
-  || "https://timetablemanagement.onrender.com";
+ const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 export default API_URL;

@@ -1,39 +1,28 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Siteroutes from "./components/siteroutes";
 import Header from "./components/header";
-import Adminheader from "./components/adminheader";
 import context from "./components/context";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import Adminheader from "./components/adminheader";
 
 function App() {
-  const [flag, setflag] = useState(localStorage.getItem("flag"));
+  const [flag, setflag] = useState(() => localStorage.getItem("flag") || null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     if (flag) {
       localStorage.setItem("flag", flag);
+    } else {
+      localStorage.removeItem("flag");
     }
   }, [flag]);
 
   return (
-    <div className="App min-h-screen flex flex-col bg-gray-50 text-slate-800 font-sans">
+    <div className="App min-h-screen flex flex-col bg-slate-50 text-slate-800 font-sans selection:bg-indigo-100 selection:text-indigo-900">
       <context.Provider value={{ setflag, flag }}>
-        {flag === "admin" ? <Adminheader /> : <Header />}
-        <main className="flex-grow flex flex-col pt-20">
+        {flag === "admin" || flag === "hod" ? <Adminheader /> : <Header />}
+        <main className="flex-grow flex flex-col pt-16 md:pt-20">
           <Siteroutes />
         </main>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
       </context.Provider>
     </div>
   );
