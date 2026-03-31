@@ -22,8 +22,11 @@ const ProtectedRoute = ({ children, allowedRole }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRole && currentFlag !== allowedRole) {
-    return <Navigate to="/" replace />;
+  if (allowedRole) {
+    const roles = Array.isArray(allowedRole) ? allowedRole : [allowedRole];
+    if (!roles.includes(currentFlag)) {
+      return <Navigate to="/" replace />;
+    }
   }
 
   return children;
@@ -37,11 +40,11 @@ const Siteroutes = () => {
 
         <Route 
           path="/timetable" 
-          element={<ProtectedRoute allowedRole="hod"><TimetablePage /></ProtectedRoute>} 
+          element={<ProtectedRoute allowedRole={["admin", "hod"]}><TimetablePage /></ProtectedRoute>} 
         />
         <Route 
           path="/showtable" 
-          element={<ProtectedRoute allowedRole="hod"><TimetableView /></ProtectedRoute>} 
+          element={<ProtectedRoute allowedRole={["admin", "hod"]}><TimetableView /></ProtectedRoute>} 
         />
         <Route path="/studentregister" element={<Studentregister />}></Route>
         <Route path="/studentlogin" element={<StudentLogin />}></Route>
@@ -51,7 +54,7 @@ const Siteroutes = () => {
         />
         <Route 
           path="/hod" 
-          element={<ProtectedRoute allowedRole="hod"><Hod /></ProtectedRoute>} 
+          element={<ProtectedRoute allowedRole={["admin", "hod"]}><Hod /></ProtectedRoute>} 
         />
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/login" element={<Login />}></Route>
